@@ -3,6 +3,7 @@
 #include <GLFW/glfw3.h>
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/type_ptr.hpp>
 
 #define SCREEN_WIDTH 800
 #define SCREEN_HEIGHT 600
@@ -49,9 +50,11 @@ int main() {
          0.5f,  0.5f,  0.0f,
         -0.5f,  0.5f,  0.0f,
         -0.5f, -0.5f,  0.0f,
+         0.5f, -0.5f,  0.0f,
     };
     unsigned int indices[] = {
         0, 1, 2,
+        2, 3, 0
     };
 
     unsigned int VBO = createVertexBufferObject();
@@ -59,10 +62,11 @@ int main() {
     unsigned int VAO = createVertexArrayObject();
     unsigned int shaderProgram = createShaderProgram();
     
-    
-    glm::mat4 model = glm::mat4(1.0f);
-    unsigned int transformLoc = glGetUniformLocation(shaderProgram, "model");
-    
+    glm::mat4 normal = glm::mat4(1.0f);
+    glm::mat4 trans = glm::mat4(1.0f);
+    trans = glm::rotate(trans, glm::radians(45.0f), glm::vec3(0.0f, 0.0f, 1.0f));
+    trans = glm::scale(trans, glm::vec3(0.5f, 0.5f, 0.5f));
+
     glBindVertexArray(VAO);
 
     glBindBuffer(GL_ARRAY_BUFFER, VBO);
@@ -78,6 +82,7 @@ int main() {
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     glBindVertexArray(0);
 
+    unsigned int transformLoc = glGetUniformLocation(shaderProgram, "transform");
     glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
     while(!glfwWindowShouldClose(window))
@@ -86,21 +91,17 @@ int main() {
 
         glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
-
-        model = glm::mat4(1.0f);
-        glUniformMatrix4fv(transformLoc, 1, GL_FALSE, &model[0][0]);
+        glUseProgram(shaderProgram);
 
         glBindVertexArray(VAO);
-        glDrawElements(GL_TRIANGLES, 3, GL_UNSIGNED_INT, 0);
+        glUniformMatrix4fv(transformLoc, 1, GL_FALSE, glm::value_ptr(normal));
+        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 
-        model = glm::rotate(glm::mat4(1.0f), (float)glfwGetTime(), glm::vec3(0.0f, 0.0f, 1.0f));
-        glUseProgram(shaderProgram);
-        glUniformMatrix4fv(transformLoc, 1, GL_FALSE, &model[0][0]);
-        
-        glDrawElements(GL_TRIANGLES, 3, GL_UNSIGNED_INT, 0);
+        glUniformMatrix4fv(transformLoc, 1, GL_FALSE, glm::value_ptr(trans));
+        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+
         glBindVertexArray(0);
         
-
         glfwSwapBuffers(window);
         glfwPollEvents();    
     }
