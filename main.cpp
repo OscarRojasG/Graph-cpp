@@ -41,7 +41,7 @@ int main() {
     {
         printf("Error al inicializar Glad");
         return 1;
-    }   
+    } 
 
     glViewport(0, 0, 800, 600);
     glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
@@ -61,11 +61,6 @@ int main() {
     unsigned int EBO = createElementBufferObject();
     unsigned int VAO = createVertexArrayObject();
     unsigned int shaderProgram = createShaderProgram();
-    
-    glm::mat4 normal = glm::mat4(1.0f);
-    glm::mat4 trans = glm::mat4(1.0f);
-    trans = glm::rotate(trans, glm::radians(45.0f), glm::vec3(0.0f, 0.0f, 1.0f));
-    trans = glm::scale(trans, glm::vec3(0.5f, 0.5f, 0.5f));
 
     glBindVertexArray(VAO);
 
@@ -83,6 +78,7 @@ int main() {
     glBindVertexArray(0);
 
     unsigned int transformLoc = glGetUniformLocation(shaderProgram, "transform");
+    unsigned int colorLoc = glGetUniformLocation(shaderProgram, "color");
     glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
     while(!glfwWindowShouldClose(window))
@@ -94,10 +90,15 @@ int main() {
         glUseProgram(shaderProgram);
 
         glBindVertexArray(VAO);
-        glUniformMatrix4fv(transformLoc, 1, GL_FALSE, glm::value_ptr(normal));
-        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+        float time = glfwGetTime();
 
+        glm::mat4 trans = glm::mat4(1.0f);
+        trans = glm::rotate(trans, time, glm::vec3(0.5f, 0.5f, 0.5f));
         glUniformMatrix4fv(transformLoc, 1, GL_FALSE, glm::value_ptr(trans));
+
+        float value = sin(time);
+        float color[3] = {value, value, value};
+        glUniform3fv(colorLoc, 1, color);
         glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 
         glBindVertexArray(0);
