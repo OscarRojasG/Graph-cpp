@@ -1,4 +1,4 @@
-g++ main.cpp glad.c  \
+g++ main.cpp glad.c class\\*.cpp  \
 	-I C:\\Users\\oscar\\Glad\\include \
 	-IC:\\Users\\Oscar\\OpenGL\\include \
 	-L C:\\Users\\Oscar\\OpenGL\\libs \

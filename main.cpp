@@ -5,22 +5,24 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
+#include "class/Program.h"
+
 #define SCREEN_WIDTH 800
 #define SCREEN_HEIGHT 600
 
+typedef struct {
+    glm::vec3 pos;
+    glm::vec3 front;
+    glm::vec3 up;
+    float speed;
+} Camera;
+
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
-void processInput(GLFWwindow *window);
+void processInput(GLFWwindow *window, Camera *camera);
 
 unsigned int createVertexBufferObject();
 unsigned int createElementBufferObject();
 unsigned int createVertexArrayObject();
-unsigned int createVertexShader();
-unsigned int createFragmentShader();
-unsigned int createShaderProgram();
-
-void checkShaderCompileErrors(unsigned int shader);
-void checkShaderProgramErrors(unsigned int program);
-const char *readFile(const char *filename);
 
 int main() {
     glfwInit();
@@ -99,7 +101,11 @@ int main() {
     unsigned int VBO = createVertexBufferObject();
     unsigned int EBO = createElementBufferObject();
     unsigned int VAO = createVertexArrayObject();
-    unsigned int shaderProgram = createShaderProgram();
+    
+    Program program;
+    program.setVertexShader("shader.vert");
+    program.setFragmentShader("shader.frag");
+    program.createProgram();
 
     glBindVertexArray(VAO);
 
@@ -118,30 +124,39 @@ int main() {
 
     glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
-    unsigned int modelLoc = glGetUniformLocation(shaderProgram, "model");
-    unsigned int viewLoc = glGetUniformLocation(shaderProgram, "view");
-    unsigned int projLoc = glGetUniformLocation(shaderProgram, "projection");
-    unsigned int colorLoc = glGetUniformLocation(shaderProgram, "color");
+    unsigned int modelLoc = glGetUniformLocation(program.getProgram(), "model");
+    unsigned int viewLoc = glGetUniformLocation(program.getProgram(), "view");
+    unsigned int projLoc = glGetUniformLocation(program.getProgram(), "projection");
+    unsigned int colorLoc = glGetUniformLocation(program.getProgram(), "color");
 
     float aspectRatio = (float)SCREEN_WIDTH / SCREEN_HEIGHT;
-    glm::mat4 model;
-    glm::mat4 view = glm::mat4(1.0f);
-    view = glm::translate(view, glm::vec3(0.0f, 0.0f, -3.0f));
+    glm::mat4 model = glm::mat4(1.0f);
     glm::mat4 projection = glm::perspective(glm::radians(45.0f), aspectRatio, 0.1f, 100.0f);
+    glm::mat4 view;
 
+    Camera *camera = (Camera *) malloc(sizeof(Camera));
+    camera->pos = glm::vec3(0.0f, 0.0f, -3.0f);
+    camera->front = glm::vec3(0.0f, 0.0f, 1.0f);
+    camera->up = glm::vec3(0.0f, 1.0f, 0.0f);
+
+    float currentFrame, lastFrame, dt;
     while(!glfwWindowShouldClose(window))
     {
-        processInput(window);
+        currentFrame = glfwGetTime();
+        dt = currentFrame - lastFrame;
+        lastFrame = currentFrame;
+
+        camera->speed = 2.5f * dt;
+        processInput(window, camera);
 
         glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-        glUseProgram(shaderProgram);
+        glUseProgram(program.getProgram());
 
         glBindVertexArray(VAO);
         float time = glfwGetTime();
 
-        model = glm::mat4(1.0f);
-        model = glm::rotate(model, time, glm::vec3(0.5f, 1.0f, 0.0f));
+        view = glm::lookAt(camera->pos, camera->pos + camera->front, camera->up);
 
         glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
         glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(view));
@@ -165,10 +180,19 @@ int main() {
     return 0;
 }
 
-void processInput(GLFWwindow *window)
+void processInput(GLFWwindow *window, Camera *camera)
 {
     if(glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
         glfwSetWindowShouldClose(window, true);
+
+    if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
+        camera->pos += camera->speed * camera->front;
+    if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
+        camera->pos -= camera->speed * camera->front;
+    if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
+        camera->pos -= glm::normalize(glm::cross(camera->front, camera->up)) * camera->speed;
+    if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
+        camera->pos += glm::normalize(glm::cross(camera->front, camera->up)) * camera->speed;
 }
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height)
@@ -195,84 +219,4 @@ unsigned int createVertexArrayObject()
     unsigned int VAO;
     glGenVertexArrays(1, &VAO);
     return VAO;
-}
-
-unsigned int createShaderProgram()
-{ 
-    unsigned int vertexShader = createVertexShader();
-    unsigned int fragmentShader = createFragmentShader();
-
-    unsigned int shaderProgram = glCreateProgram();
-    glAttachShader(shaderProgram, vertexShader);
-    glAttachShader(shaderProgram, fragmentShader);
-    glLinkProgram(shaderProgram);
-    checkShaderProgramErrors(shaderProgram);
-
-    glDeleteShader(vertexShader);
-    glDeleteShader(fragmentShader);
-    return shaderProgram;
-}
-
-unsigned int createVertexShader()
-{
-    const char *vertexShaderSource = readFile("shader.vert");
-    unsigned int vertexShader = glCreateShader(GL_VERTEX_SHADER);
-    glShaderSource(vertexShader, 1, &vertexShaderSource, NULL);
-    glCompileShader(vertexShader);
-    checkShaderCompileErrors(vertexShader);
-
-    return vertexShader;
-}
-
-unsigned int createFragmentShader()
-{
-    const char *fragmentShaderSource = readFile("shader.frag");
-    unsigned int fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
-    glShaderSource(fragmentShader, 1, &fragmentShaderSource, NULL);
-    glCompileShader(fragmentShader);
-    checkShaderCompileErrors(fragmentShader);
-
-    return fragmentShader;
-}
-
-const char *readFile(const char *filename)
-{
-    FILE *file = fopen(filename, "r");
-    if(!file)
-    {
-        printf("Error al abrir el archivo");
-        return NULL;
-    }
-
-    char *buffer = (char *) malloc(1001 * sizeof(char));
-	int size = fread(buffer, sizeof(char), 1000, file);
-    buffer[size] = '\0';
-    fclose(file);
-
-    return buffer;
-}
-void checkShaderCompileErrors(unsigned int shader)
-{
-    int success;
-    char infoLog[512];
-    glGetShaderiv(shader, GL_COMPILE_STATUS, &success);
-
-    if(!success)
-    {
-        glGetShaderInfoLog(shader, 512, NULL, infoLog);
-        printf("Error al compilar el shader: %s", infoLog);
-    }
-}
-
-void checkShaderProgramErrors(unsigned int program)
-{
-    int success;
-    char infoLog[512];
-    glGetProgramiv(program, GL_LINK_STATUS, &success);
-
-    if(!success)
-    {
-        glGetProgramInfoLog(program, 512, NULL, infoLog);
-        printf("Error al enlazar los shaders: %s", infoLog);
-    }
 }
