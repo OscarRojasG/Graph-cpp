@@ -124,11 +124,6 @@ int main() {
 
     glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
-    unsigned int modelLoc = glGetUniformLocation(program.getProgram(), "model");
-    unsigned int viewLoc = glGetUniformLocation(program.getProgram(), "view");
-    unsigned int projLoc = glGetUniformLocation(program.getProgram(), "projection");
-    unsigned int colorLoc = glGetUniformLocation(program.getProgram(), "color");
-
     float aspectRatio = (float)SCREEN_WIDTH / SCREEN_HEIGHT;
     glm::mat4 model = glm::mat4(1.0f);
     glm::mat4 projection = glm::perspective(glm::radians(45.0f), aspectRatio, 0.1f, 100.0f);
@@ -158,15 +153,16 @@ int main() {
 
         view = glm::lookAt(camera->pos, camera->pos + camera->front, camera->up);
 
-        glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
-        glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(view));
-        glUniformMatrix4fv(projLoc, 1, GL_FALSE, glm::value_ptr(projection));
+        program.setModel(model);
+        program.setView(view);
+        program.setProjection(projection);
 
         float r = sin(time/2)  / 2 + 0.5f;
         float g = cos(time/2)  / 2 + 0.5f;
         float b = sin(-time/2) / 2 + 0.5f;
-        float color[] = {r, g, b};
-        glUniform3fv(colorLoc, 1, color);
+        float color[3] = {r, g, b};
+        program.setColor(color);
+
         glDrawArrays(GL_TRIANGLES, 0, 36);
 
         glBindVertexArray(0);
