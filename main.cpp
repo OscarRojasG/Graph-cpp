@@ -8,11 +8,8 @@
 #include "class/Program.h"
 #include "class/Camera.h"
 #include "class/Time.h"
+#include "class/Window.h"
 
-#define SCREEN_WIDTH 800
-#define SCREEN_HEIGHT 600
-
-void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void processInput(GLFWwindow *window);
 
 unsigned int createVertexBufferObject();
@@ -21,18 +18,9 @@ unsigned int createVertexArrayObject();
 
 int main() {
     glfwInit();
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
-    glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
-    GLFWwindow* window = glfwCreateWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "Graph", NULL, NULL);
-    if (window == NULL)
-    {
-        printf("Error al crear la ventana");
-        glfwTerminate();
-        return 1;
-    }
-    glfwMakeContextCurrent(window); 
+    Window window(800, 600, "Graph");
+    window.createWindow();
 
     if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
     {
@@ -41,7 +29,6 @@ int main() {
     } 
 
     glViewport(0, 0, 800, 600);
-    glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
 
     float vertices[] = {
         -0.5f, -0.5f, -0.5f,
@@ -119,13 +106,13 @@ int main() {
 
     glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
-    float aspectRatio = (float)SCREEN_WIDTH / SCREEN_HEIGHT;
+    float aspectRatio = (float)window.getWidth() / window.getHeight();
     glm::mat4 model = glm::mat4(1.0f);
     glm::mat4 projection = glm::perspective(glm::radians(45.0f), aspectRatio, 0.1f, 100.0f);
     glm::mat4 view;
 
     Camera camera(
-        window,
+        window.getWindow(),
         glm::vec3(0.0f, 0.0f, -3.0f),
         glm::vec3(0.0f, 0.0f, 1.0f),
         glm::vec3(0.0f, 1.0f, 0.0f)
@@ -133,10 +120,9 @@ int main() {
 
     Time time;
 
-    float currentFrame, lastFrame, dt;
-    while(!glfwWindowShouldClose(window))
+    while(!glfwWindowShouldClose(window.getWindow()))
     {
-        processInput(window);
+        processInput(window.getWindow());
 
         camera.setSpeed(2.5f * time.getDelta());
         camera.move();
@@ -162,12 +148,11 @@ int main() {
         glDrawArrays(GL_TRIANGLES, 0, 36);
         glBindVertexArray(0);
         
-        glfwSwapBuffers(window);
+        glfwSwapBuffers(window.getWindow());
         glfwPollEvents();    
     }
 
     glfwTerminate();
-
     return 0;
 }
 
@@ -175,11 +160,6 @@ void processInput(GLFWwindow *window)
 {
     if(glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
         glfwSetWindowShouldClose(window, true);
-}
-
-void framebuffer_size_callback(GLFWwindow* window, int width, int height)
-{
-    glViewport(0, 0, width, height);
 }
 
 unsigned int createVertexBufferObject()
