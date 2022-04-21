@@ -7,6 +7,7 @@
 
 #include "class/Program.h"
 #include "class/Camera.h"
+#include "class/Time.h"
 
 #define SCREEN_WIDTH 800
 #define SCREEN_HEIGHT 600
@@ -130,38 +131,35 @@ int main() {
         glm::vec3(0.0f, 1.0f, 0.0f)
     );
 
+    Time time;
+
     float currentFrame, lastFrame, dt;
     while(!glfwWindowShouldClose(window))
     {
-        currentFrame = glfwGetTime();
-        dt = currentFrame - lastFrame;
-        lastFrame = currentFrame;
-
-        camera.setSpeed(2.5f * dt);
-        camera.move();
         processInput(window);
+
+        camera.setSpeed(2.5f * time.getDelta());
+        camera.move();
+        view = camera.getLookAtMatrix();
 
         glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-        glUseProgram(program.getProgram());
 
+        program.use();
         glBindVertexArray(VAO);
-        float time = glfwGetTime();
-
-        view = camera.getLookAtMatrix();
 
         program.setModel(model);
         program.setView(view);
         program.setProjection(projection);
 
-        float r = sin(time/2)  / 2 + 0.5f;
-        float g = cos(time/2)  / 2 + 0.5f;
-        float b = sin(-time/2) / 2 + 0.5f;
+        float current = time.getCurrent();
+        float r = sin(current / 2) / 2 + 0.5f;
+        float g = cos(current / 2) / 2 + 0.5f;
+        float b = sin(-current / 2) / 2 + 0.5f;
         float color[3] = {r, g, b};
         program.setColor(color);
 
         glDrawArrays(GL_TRIANGLES, 0, 36);
-
         glBindVertexArray(0);
         
         glfwSwapBuffers(window);
