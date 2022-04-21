@@ -14,16 +14,6 @@ class Program
         unsigned int fshader_id;
         unsigned int program_id;
 
-        glm::mat4 model;
-        glm::mat4 view;
-        glm::mat4 proj;
-        float color[3];
-
-        unsigned int model_loc;
-        unsigned int view_loc;
-        unsigned int proj_loc;
-        unsigned int color_loc;
-
         void checkShaderErrors(unsigned int shader);
         void checkProgramErrors(unsigned int program);
         const char *readShaderFile(const char *filename);
