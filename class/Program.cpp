@@ -79,11 +79,6 @@ const char *Program::readShaderFile(const char *filename)
     return (const char *) buffer;
 }
 
-unsigned int Program::getProgram()
-{
-    return program_id;
-}
-
 void Program::use()
 {
     glUseProgram(program_id);
