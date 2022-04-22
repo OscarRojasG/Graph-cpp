@@ -35,19 +35,19 @@ int main() {
     Plane plane;
     plane.create();
 
-    glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-
-    float aspectRatio = (float)window.getWidth() / window.getHeight();
     glm::mat4 view;
 
     Camera camera(
         window.getWindow(),
-        glm::vec3(0.0f, 0.0f, -3.0f),
-        glm::vec3(0.0f, 0.0f, 1.0f),
+        glm::vec3(0.0f, 1.0f, 0.0f),
+        glm::vec3(0.0f, -1.0f, 1.0f),
         glm::vec3(0.0f, 1.0f, 0.0f)
     );
 
     Time time;
+
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
     while(!glfwWindowShouldClose(window.getWindow()))
     {
@@ -62,7 +62,7 @@ int main() {
 
         program.use();
         program.setView(view);
-        plane.draw(program);
+        plane.draw(program, window);
         
         glfwSwapBuffers(window.getWindow());
         glfwPollEvents();    

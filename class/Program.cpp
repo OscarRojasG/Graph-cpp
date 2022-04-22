@@ -71,8 +71,8 @@ const char *Program::readShaderFile(const char *filename)
         return NULL;
     }
 
-    char *buffer = (char *) malloc(1001 * sizeof(char));
-	int size = fread(buffer, sizeof(char), 1000, file);
+    char *buffer = (char *) malloc(2001 * sizeof(char));
+	int size = fread(buffer, sizeof(char), 2000, file);
     buffer[size] = '\0';
     fclose(file);
 

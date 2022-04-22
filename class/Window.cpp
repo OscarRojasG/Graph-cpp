@@ -27,10 +27,12 @@ GLFWwindow *Window::getWindow()
 
 int Window::getHeight()
 {
+    glfwGetWindowSize(window, &width, &height);
     return height;
 }
 
 int Window::getWidth()
 {
+    glfwGetWindowSize(window, &width, &height);
     return width;
 }

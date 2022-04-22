@@ -3,6 +3,7 @@
 #include <glm/gtc/matrix_transform.hpp>
 
 #include "Program.h"
+#include "Window.h"
 
 class Plane
 {
@@ -30,5 +31,5 @@ class Plane
         }
 
         void create();
-        void draw(Program program);
+        void draw(Program program, Window window);
 };
