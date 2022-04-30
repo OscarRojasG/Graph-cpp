@@ -12,9 +12,9 @@
 #include "class/Plane.h"
 
 Camera camera(
-    glm::vec3(0.0f, 1.0f, 0.0f),
+    glm::vec3(0.0f,  1.0f, 0.0f),
     glm::vec3(0.0f, -1.0f, 1.0f),
-    glm::vec3(0.0f, 1.0f, 0.0f)
+    glm::vec3(0.0f,  1.0f, 0.0f)
 );
 
 void processInput(GLFWwindow *window);
@@ -49,7 +49,8 @@ int main() {
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-    glfwSetCursorPosCallback(window.getWindow(), mouse_callback);  
+    glfwSetCursorPosCallback(window.getWindow(), mouse_callback); 
+    glfwSetInputMode(window.getWindow(), GLFW_CURSOR, GLFW_CURSOR_DISABLED); 
 
     while(!glfwWindowShouldClose(window.getWindow()))
     {
@@ -61,7 +62,7 @@ int main() {
 
         glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
+        
         program.use();
         program.setView(view);
         plane.draw(program, window);

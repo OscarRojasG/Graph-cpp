@@ -22,6 +22,7 @@ vec4 grid(vec3 fragPos3D, float scale) {
         color.x = 1.0;
     return color;
 }
+
 void main() {
     float t = -nearPoint.y / (farPoint.y - nearPoint.y);
     vec3 fragPos3D = nearPoint + t * (farPoint - nearPoint);
