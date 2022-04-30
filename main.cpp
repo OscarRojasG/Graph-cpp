@@ -11,7 +11,14 @@
 #include "class/Window.h"
 #include "class/Plane.h"
 
+Camera camera(
+    glm::vec3(0.0f, 1.0f, 0.0f),
+    glm::vec3(0.0f, -1.0f, 1.0f),
+    glm::vec3(0.0f, 1.0f, 0.0f)
+);
+
 void processInput(GLFWwindow *window);
+void mouse_callback(GLFWwindow* window, double xpos, double ypos);
 
 int main() {
     glfwInit();
@@ -37,25 +44,20 @@ int main() {
 
     glm::mat4 view;
 
-    Camera camera(
-        window.getWindow(),
-        glm::vec3(0.0f, 1.0f, 0.0f),
-        glm::vec3(0.0f, -1.0f, 1.0f),
-        glm::vec3(0.0f, 1.0f, 0.0f)
-    );
-
     Time time;
 
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+    glfwSetCursorPosCallback(window.getWindow(), mouse_callback);  
 
     while(!glfwWindowShouldClose(window.getWindow()))
     {
         processInput(window.getWindow());
 
         camera.setSpeed(2.5f * time.getDelta());
-        camera.move();
-        view = camera.getLookAtMatrix();
+        camera.move(window.getWindow());
+        view = camera.getViewMatrix();
 
         glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -76,4 +78,21 @@ void processInput(GLFWwindow *window)
 {
     if(glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
         glfwSetWindowShouldClose(window, true);
+}
+
+bool firstMouse = true;
+void mouse_callback(GLFWwindow *window, double x, double y) {
+    if(firstMouse)
+    {
+        camera.setLastX(x);
+        camera.setLastY(y);
+        firstMouse = false;
+    }
+  
+    float xoffset = x - camera.getLastX();
+    float yoffset = camera.getLastY() - y; 
+    camera.setLastX(x);
+    camera.setLastY(y);
+
+    camera.updateAngle(xoffset, yoffset);
 }
