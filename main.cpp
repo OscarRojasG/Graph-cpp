@@ -10,6 +10,7 @@
 #include "class/Time.h"
 #include "class/Window.h"
 #include "class/Plane.h"
+#include "class/Cube.h"
 
 Camera camera(
     glm::vec3(0.0f,  1.0f, 0.0f),
@@ -35,12 +36,17 @@ int main() {
     glViewport(0, 0, window.getWidth(), window.getHeight());
     
     Program planeProgram;
-    planeProgram.setVertexShader("shader.vert");
-    planeProgram.setFragmentShader("shader.frag");
+    planeProgram.setVertexShader("plane.vert");
+    planeProgram.setFragmentShader("plane.frag");
     planeProgram.createProgram();
 
+    Program cubeProgram;
+    cubeProgram.setVertexShader("cube.vert");
+    cubeProgram.setFragmentShader("cube.frag");
+    cubeProgram.createProgram();
+
     Plane plane;
-    plane.create();
+    Cube cube;
 
     glm::mat4 view;
 
@@ -67,6 +73,10 @@ int main() {
         planeProgram.setView(view);
         plane.draw(planeProgram, window);
         
+        cubeProgram.use();
+        cubeProgram.setView(view);
+        cube.draw(cubeProgram, window);
+
         glfwSwapBuffers(window.getWindow());
         glfwPollEvents();    
     }

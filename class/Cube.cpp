@@ -1,16 +1,16 @@
-#include "Plane.h"
+#include "Cube.h"
 
-unsigned int Plane::createVAO()
+unsigned int Cube::createVAO()
 {
     glGenVertexArrays(1, &VAO);
 }
 
-unsigned int Plane::createVBO()
+unsigned int Cube::createVBO()
 {
     glGenBuffers(1, &VBO);
 }
 
-void Plane::create()
+void Cube::create()
 {
     createVAO();
     createVBO();
@@ -27,7 +27,7 @@ void Plane::create()
     glBindVertexArray(0);
 }
 
-void Plane::draw(Program program, Window window)
+void Cube::draw(Program program, Window window)
 {
     float ratio = (float)window.getWidth() / window.getHeight();
     glm::mat4 projection = glm::perspective(glm::radians(45.0f), (float)ratio, 0.01f, 100.0f);
@@ -35,6 +35,6 @@ void Plane::draw(Program program, Window window)
 
     glBindVertexArray(VAO);
 
-    glDrawArrays(GL_TRIANGLES, 0, 6);
+    glDrawArrays(GL_TRIANGLES, 0, 36);
     glBindVertexArray(0);
 }

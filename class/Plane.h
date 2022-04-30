@@ -20,16 +20,15 @@ class Plane
 
         unsigned int VBO;
         unsigned int VAO;
+        void create();
         unsigned int createVBO();
         unsigned int createVAO();
 
     public:
-        Plane()
+        Plane() 
         {
-            createVAO();
-            createVBO();
+            create();
         }
 
-        void create();
         void draw(Program program, Window window);
 };
