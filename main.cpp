@@ -34,10 +34,10 @@ int main() {
 
     glViewport(0, 0, window.getWidth(), window.getHeight());
     
-    Program program;
-    program.setVertexShader("shader.vert");
-    program.setFragmentShader("shader.frag");
-    program.createProgram();
+    Program planeProgram;
+    planeProgram.setVertexShader("shader.vert");
+    planeProgram.setFragmentShader("shader.frag");
+    planeProgram.createProgram();
 
     Plane plane;
     plane.create();
@@ -63,9 +63,9 @@ int main() {
         glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         
-        program.use();
-        program.setView(view);
-        plane.draw(program, window);
+        planeProgram.use();
+        planeProgram.setView(view);
+        plane.draw(planeProgram, window);
         
         glfwSwapBuffers(window.getWindow());
         glfwPollEvents();    

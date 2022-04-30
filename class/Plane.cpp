@@ -26,15 +26,9 @@ void Plane::create()
 
 void Plane::draw(Program program, Window window)
 {
-    glm::mat4 model = glm::mat4(1.0f);
-    program.setModel(model);
-
     float ratio = (float)window.getWidth() / window.getHeight();
     glm::mat4 projection = glm::perspective(glm::radians(45.0f), (float)ratio, 0.01f, 100.0f);
     program.setProjection(projection);
-
-    float color[3] = {0.0f, 0.5f, 0.5f};
-    program.setColor(color);
 
     glBindVertexArray(VAO);
 

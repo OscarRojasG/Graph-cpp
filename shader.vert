@@ -3,7 +3,6 @@ layout (location = 0) in vec3 p;
 layout (location = 1) out vec3 nearPoint;
 layout (location = 2) out vec3 farPoint;
 
-uniform mat4 model;
 uniform mat4 view;
 uniform mat4 projection;
 

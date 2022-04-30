@@ -4,8 +4,6 @@ layout (location = 2) in vec3 farPoint;
 
 out vec4 fragmentColor;
 
-uniform vec3 color;
-
 vec4 grid(vec3 fragPos3D, float scale) {
     vec2 coord = fragPos3D.xz * scale; // use the scale variable to set the distance between the lines
     vec2 derivative = fwidth(coord);
