@@ -1,11 +1,15 @@
+#ifndef PLANE_H
+#define PLANE_H
+
 #include <glad/glad.h>
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
 #include "Program.h"
 #include "Window.h"
+#include "Shape.h"
 
-class Plane
+class Plane : private Shape
 {
     private:
         float vertices[18] = {
@@ -18,17 +22,16 @@ class Plane
             1.0f, -1.0f, 0.0f
         };
 
-        unsigned int VBO;
         unsigned int VAO;
-        void create();
-        unsigned int createVBO();
-        unsigned int createVAO();
+        unsigned int VBO;
 
     public:
         Plane() 
         {
-            create();
+            initializeShape(vertices, &VAO, &VBO);
         }
 
         void draw(Program program, Window window);
 };
+
+#endif

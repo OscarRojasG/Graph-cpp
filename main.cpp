@@ -49,7 +49,6 @@ int main() {
     Cube cube;
 
     glm::mat4 view;
-
     Time time;
 
     glEnable(GL_BLEND);
@@ -68,17 +67,17 @@ int main() {
 
         glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-        
+
         planeProgram.use();
         planeProgram.setView(view);
         plane.draw(planeProgram, window);
-        
+
         cubeProgram.use();
         cubeProgram.setView(view);
         cube.draw(cubeProgram, window);
 
         glfwSwapBuffers(window.getWindow());
-        glfwPollEvents();    
+        glfwPollEvents();
     }
 
     glfwTerminate();
